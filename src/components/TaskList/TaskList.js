@@ -1,7 +1,10 @@
 import { Task } from "components/Task/Task";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { statusFilters } from "redux/constants";
 import css from "./TaskList.module.css";
+import { getTasks } from "redux/selectors";
+import { useEffect } from "react";
+import { fetchTasks } from "redux/operations";
 
 const getVisibleTasks = (tasks, statusFilter) => {
   switch (statusFilter) {
@@ -15,16 +18,29 @@ const getVisibleTasks = (tasks, statusFilter) => {
 };
 
 export const TaskList = () => {
-  const tasks = useSelector(state => state.tasks);
+  const tasks = useSelector(state => state.tasks.items);
   const statusFilter = useSelector(state => state.filters.status);
   const visibleTasks = getVisibleTasks(tasks, statusFilter);
+  const { items, isLoading, error } = useSelector(getTasks);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchTasks());
+  }, [dispatch]);
+
   return (
-    <ul className={css.list}>
-      {visibleTasks.map(task => (
-        <li className={css.listItem} key={task.id}>
-          <Task task={task} />
-        </li>
-      ))}
-    </ul>
+    <div>
+      {isLoading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
+      {items.length > 0 && (
+        <ul className={css.list}>
+          {visibleTasks.map(task => (
+            <li className={css.listItem} key={task.id}>
+              <Task task={task} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 };

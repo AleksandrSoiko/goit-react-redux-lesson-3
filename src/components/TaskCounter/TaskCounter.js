@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import css from "./TaskCounter.module.css";
 
 export const TaskCounter = () => {
-  const tasks = useSelector(state => state.tasks);
+  const tasks = useSelector(state => state.tasks.items);
 
   const count = tasks.reduce(
     (acc, task) => {
